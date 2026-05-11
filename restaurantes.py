@@ -39,22 +39,97 @@ def verifica_restaurante_cadastrado(nome, categoria, restaurantes_cadastrados):
     return False
 
 
+def escolher_categoria():
+    
+    """
+    Exibe uma lista de categorias disponíveis e permite ao usuário escolher uma opção.
+
+    As categorias são apresentadas de forma enumerada no terminal, e o usuário
+    deve selecionar uma delas digitando o número correspondente.
+
+    Durante o processo, é possível cancelar a operação digitando 'voltar',
+    retornando ao menu principal do sistema.
+
+    Returns:
+        str: Categoria escolhida pelo usuário.
+        None: Caso a operação seja cancelada.
+    """
+    
+    categorias = [
+    'Pizza',
+    'Hambúrguer',
+    'Japonesa',
+    'Brasileira',
+    'Italiana',
+    'Lanches',
+    'Doces',
+    'Padaria',
+    'Cafeteria',
+    'Salgados',
+    'Churrasco',
+    'Saudável',
+    'Vegetariana',
+    'Vegana',
+    'Mexicana',
+    'Árabe',
+    'Chinesa',
+    'Pastel',
+    'Sorvetes',
+    'Peixes e Frutos do Mar',
+    'Bebidas',
+    'Comida Regional',
+    'Marmita'
+    ]
+
+    while True:
+        for indice, categoria in enumerate(categorias, start=1):
+            print(f'{indice} - {categoria}')
+        
+        opcao = input('\nEscolha uma categoria ou ("voltar" para cancelar a operação): ').strip()
+            
+        if opcao.lower() == 'voltar':
+            cancelar_operacao()
+            return None
+
+        try:
+            escolha = int(opcao)
+            
+            if 1 <= escolha <= len(categorias):
+
+                categoria_escolhida = categorias[escolha - 1]
+
+                print(f'\nCategoria escolhida: {categoria_escolhida}')
+                return categoria_escolhida
+            
+            else:
+                print('\nOpção inválida.\n')
+
+        except ValueError:
+            print('\nDigite apenas números.\n')
+
 def cadastrar_novo_restaurante():
 
     """
     Cadastra um novo restaurante no sistema.
 
-    Solicita o nome e a categoria do restaurante através do terminal,
-    com validação para impedir entradas vazias ou inválidas.
+    Solicita o nome do restaurante e utiliza a função escolher_categoria()
+    para permitir que o usuário selecione uma categoria pré-definida.
+
+    O nome informado é normalizado utilizando .title() para padronizar
+    a formatação antes do armazenamento.
+
+    O sistema realiza validações para impedir:
+    - nomes vazios;
+    - categorias inválidas;
+    - cadastro duplicado de restaurantes.
 
     Durante o processo, o usuário pode digitar 'voltar' para cancelar
-    o cadastro e retornar ao menu principal.
+    a operação e retornar ao menu principal.
 
-    O fluxo de cancelamento foi abstraído para evitar repetição de código
-    (princípio DRY), centralizando o comportamento de encerramento do cadastro.
+    Após as validações, os dados do restaurante são armazenados
+    em um dicionário e adicionados à lista de restaurantes cadastrados.
 
-    Após a validação, os dados são armazenados em um dicionário e
-    adicionados à lista de restaurantes cadastrados.
+    Não retorna valores.
     """
 
     exibir_subtitulo('Cadastro de novos restaurantes')
@@ -69,19 +144,14 @@ def cadastrar_novo_restaurante():
         if not nome_do_restaurante:
             print('O nome não pode estar vazio. Tente novamente.\n')
         else:
+            nome_do_restaurante = nome_do_restaurante.title()
             break
 
-    while True:
-        categoria = input(f'Digite a categoria do restaurante {nome_do_restaurante} ou ("voltar" para cancelar a operação): ').strip()
 
-        if categoria.lower() == 'voltar':
-            cancelar_operacao()
-            return
-
-        if not categoria:
-            print(f'A categoria não pode estar vazia. Tente novamente.\n')
-        else:
-            break
+    categoria = escolher_categoria()
+    
+    if categoria is None:
+        return
         
     if verifica_restaurante_cadastrado(nome_do_restaurante, categoria, restaurantes_cadastrados):
         print(f'Restaurante {nome_do_restaurante} já cadastrado.\n')
