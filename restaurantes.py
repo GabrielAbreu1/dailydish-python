@@ -7,6 +7,33 @@ restaurantes_cadastrados = [
     {'nome': 'Cantina', 'categoria': 'Italiano', 'ativo': False}
 ]
 
+    
+CATEGORIAS = [
+    'Pizza',
+    'Hambúrguer',
+    'Japonesa',
+    'Brasileira',
+    'Italiana',
+    'Lanches',
+    'Doces',
+    'Padaria',
+    'Cafeteria',
+    'Salgados',
+    'Churrasco',
+    'Saudável',
+    'Vegetariana',
+    'Vegana',
+    'Mexicana',
+    'Árabe',
+    'Chinesa',
+    'Pastel',
+    'Sorvetes',
+    'Peixes e Frutos do Mar',
+    'Bebidas',
+    'Comida Regional',
+    'Marmita'
+]
+
 
 def verifica_restaurante_cadastrado(nome, categoria, restaurantes_cadastrados):
 
@@ -42,10 +69,12 @@ def verifica_restaurante_cadastrado(nome, categoria, restaurantes_cadastrados):
 def escolher_categoria():
     
     """
-    Exibe uma lista de categorias disponíveis e permite ao usuário escolher uma opção.
+    Exibe as categorias disponíveis cadastradas no sistema e permite ao usuário escolher uma opção.
 
-    As categorias são apresentadas de forma enumerada no terminal, e o usuário
-    deve selecionar uma delas digitando o número correspondente.
+    As categorias são obtidas da constante global CATEGORIAS e apresentadas
+    de forma enumerada no terminal.
+
+    O usuário deve selecionar uma categoria digitando o número correspondente.
 
     Durante o processo, é possível cancelar a operação digitando 'voltar',
     retornando ao menu principal do sistema.
@@ -54,35 +83,9 @@ def escolher_categoria():
         str: Categoria escolhida pelo usuário.
         None: Caso a operação seja cancelada.
     """
-    
-    categorias = [
-    'Pizza',
-    'Hambúrguer',
-    'Japonesa',
-    'Brasileira',
-    'Italiana',
-    'Lanches',
-    'Doces',
-    'Padaria',
-    'Cafeteria',
-    'Salgados',
-    'Churrasco',
-    'Saudável',
-    'Vegetariana',
-    'Vegana',
-    'Mexicana',
-    'Árabe',
-    'Chinesa',
-    'Pastel',
-    'Sorvetes',
-    'Peixes e Frutos do Mar',
-    'Bebidas',
-    'Comida Regional',
-    'Marmita'
-    ]
 
     while True:
-        for indice, categoria in enumerate(categorias, start=1):
+        for indice, categoria in enumerate(CATEGORIAS, start=1):
             print(f'{indice} - {categoria}')
         
         opcao = input('\nEscolha uma categoria ou ("voltar" para cancelar a operação): ').strip()
@@ -94,9 +97,9 @@ def escolher_categoria():
         try:
             escolha = int(opcao)
             
-            if 1 <= escolha <= len(categorias):
+            if 1 <= escolha <= len(CATEGORIAS):
 
-                categoria_escolhida = categorias[escolha - 1]
+                categoria_escolhida = CATEGORIAS[escolha - 1]
 
                 print(f'\nCategoria escolhida: {categoria_escolhida}')
                 return categoria_escolhida
