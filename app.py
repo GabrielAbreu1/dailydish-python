@@ -1,6 +1,6 @@
 from utils import limpar_tela, exibir_nome_do_programa, exibir_opcoes
 from menus import finalizar_app, opcao_invalida
-from restaurantes import alternar_estado_restaurante, listar_restaurantes, cadastrar_novo_restaurante
+from restaurantes import alternar_estado_restaurante, listar_restaurantes, cadastrar_novo_restaurante, listar_restaurantes_por_categoria
 
 def escolher_opcao():
     """
@@ -20,9 +20,12 @@ def escolher_opcao():
                 listar_restaurantes()
                 return True
             case 3:
-                alternar_estado_restaurante()
+                listar_restaurantes_por_categoria()
                 return True
             case 4:
+                alternar_estado_restaurante()
+                return True
+            case 5:
                 finalizar_app()
                 return False
             case _:

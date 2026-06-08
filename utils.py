@@ -34,9 +34,10 @@ def exibir_opcoes():
     disponíveis no sistema.
     """
     print('1. Cadastrar Restaurante')
-    print('2. Listar Restaurante')
-    print('3. Alterar Status Restaurante')
-    print('4. Sair\n')
+    print('2. Listar Restaurantes')
+    print('3. Filtrar por Categoria')
+    print('4. Alterar Status Restaurante')
+    print('5. Sair\n')
 
 
 def exibir_subtitulo(texto):

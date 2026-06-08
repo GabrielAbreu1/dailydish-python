@@ -229,6 +229,50 @@ def listar_restaurantes():
         )
 
     input('\nPressione Enter para continuar.')
+    
+    
+def listar_restaurantes_por_categoria():
+    """
+    Exibe os restaurantes cadastrados de uma categoria específica.
+
+    Solicita ao usuário a escolha de uma categoria e lista todos os
+    restaurantes pertencentes a ela, mostrando nome, categoria e status.
+
+    Caso nenhum restaurante seja encontrado na categoria selecionada,
+    uma mensagem informativa é exibida.
+
+    O usuário pode cancelar a operação durante a seleção da categoria.
+
+    Returns:
+        None
+    """
+    exibir_subtitulo('Filtrando Restaurantes por Categoria')
+    categoria_restaurante = escolher_categoria()
+    
+    if categoria_restaurante is None:
+        return
+    
+    lista_restaurante_categoria = []
+    
+    for restaurante in Restaurante.restaurantes_cadastrados:
+        
+        if categoria_restaurante.lower() == restaurante.categoria.strip().lower():
+            lista_restaurante_categoria.append(restaurante)
+
+
+    if not lista_restaurante_categoria:
+        print('Nenhum restaurante encontrado nessa categoria.\n')
+    else:
+        print(f'{"Nome do restaurante".ljust(22)} | {"Categoria".ljust(20)} | Status')
+        for restaurante in lista_restaurante_categoria:
+            print(
+            f'- {restaurante.nome.ljust(20)} | '
+            f'{restaurante.categoria.ljust(20)} | '
+            f'{restaurante.status}'
+             )
+    input('\nPressione Enter para continuar.')
+    
+    
 
 
 def alternar_estado_restaurante():
