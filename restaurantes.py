@@ -1,10 +1,56 @@
+from __future__ import annotations
 from utils import exibir_subtitulo
 from menus import cancelar_operacao
 
-restaurantes_cadastrados = [
-    {'nome': 'Praça', 'categoria': 'Japonesa', 'ativo': False},
-    {'nome': 'Pizza Suprema', 'categoria': 'Pizza', 'ativo': True},
-    {'nome': 'Cantina', 'categoria': 'Italiano', 'ativo': False}
+class Restaurante:
+    restaurantes_cadastrados: list['Restaurante'] = []
+    
+    def __init__(self, nome, categoria):
+        self._nome = nome
+        self._categoria = categoria
+        self._ativo = False
+    
+    @property
+    def nome(self):
+        return self._nome
+    
+    @property
+    def categoria(self):
+        return self._categoria
+    
+    @property
+    def ativo(self):
+        return self._ativo
+    
+    @property
+    def status(self):
+        """Retorna o estado de funcionamento do restaurante."""
+        
+        return 'Restaurante aberto' if self.ativo else 'Restaurante fechado'
+    
+    def __str__(self):
+        """
+        Retorna uma representação textual do restaurante.
+        Returns:
+        str: Nome, categoria e status do restaurante.
+        """
+        
+        return f'{self.nome} | {self.categoria} | {self.status}'
+    
+    def alternar_estado(self):
+        """
+        Alterna o estado de funcionamento do restaurante.
+        Inverte o valor do atributo _ativo:
+        - True para False
+        - False para True
+        """
+        
+        self._ativo = not self._ativo
+
+Restaurante.restaurantes_cadastrados = [
+    Restaurante('Praça', 'Japonesa'),
+    Restaurante('Pizza Suprema', 'Pizza'),
+    Restaurante('Cantina', 'Italiana')
 ]
 
     
@@ -38,29 +84,25 @@ CATEGORIAS = [
 def verifica_restaurante_cadastrado(nome, categoria, restaurantes_cadastrados):
 
     """
-    Verifica se já existe um restaurante cadastrado com o mesmo nome e categoria.
-
-    A comparação é feita ignorando diferenças de maiúsculas/minúsculas
-    e espaços extras no início e fim das strings.
+    Verifica se um restaurante com o mesmo nome e categoria já está cadastrado.
 
     Args:
-        nome (str): Nome do restaurante a ser verificado.
+        nome (str): Nome do restaurante.
         categoria (str): Categoria do restaurante.
-        restaurantes_cadastrados (list): Lista de restaurantes já cadastrados.
+        restaurantes_cadastrados (list[Restaurante]): Restaurantes cadastrados.
 
     Returns:
-        bool: True se já existir um restaurante com o mesmo nome e categoria,
-              False caso contrário.
+        bool: True se o restaurante já existir, False caso contrário.
     """
 
-    nome = nome.strip().lower()
-    categoria = categoria.strip().lower()
+    nome_normalizado = nome.strip().lower()
+    categoria_normalizada = categoria.strip().lower()
 
     for restaurante in restaurantes_cadastrados:
-        nome_existente = restaurante['nome'].strip().lower()
-        categoria_existente = restaurante['categoria'].strip().lower()
+        nome_existente = restaurante.nome.strip().lower()
+        categoria_existente = restaurante.categoria.strip().lower()
 
-        if nome_existente == nome and categoria_existente == categoria:
+        if nome_existente == nome_normalizado and categoria_existente == categoria_normalizada:
             return True
 
     return False
@@ -113,26 +155,22 @@ def escolher_categoria():
 def cadastrar_novo_restaurante():
 
     """
-    Cadastra um novo restaurante no sistema.
+    Realiza o cadastro de um novo restaurante no sistema.
 
-    Solicita o nome do restaurante e utiliza a função escolher_categoria()
-    para permitir que o usuário selecione uma categoria pré-definida.
+    O processo solicita o nome do restaurante e a categoria escolhida
+    pelo usuário, validando:
+    - nome não vazio;
+    - categoria válida;
+    - inexistência de cadastro duplicado.
 
-    O nome informado é normalizado utilizando .title() para padronizar
-    a formatação antes do armazenamento.
+    Caso todas as validações sejam aprovadas, uma nova instância de
+    Restaurante é criada e adicionada à lista de restaurantes
+    cadastrados.
 
-    O sistema realiza validações para impedir:
-    - nomes vazios;
-    - categorias inválidas;
-    - cadastro duplicado de restaurantes.
+    O usuário pode cancelar a operação antes da conclusão do cadastro.
 
-    Durante o processo, o usuário pode digitar 'voltar' para cancelar
-    a operação e retornar ao menu principal.
-
-    Após as validações, os dados do restaurante são armazenados
-    em um dicionário e adicionados à lista de restaurantes cadastrados.
-
-    Não retorna valores.
+    Returns:
+        None
     """
 
     exibir_subtitulo('Cadastro de novos restaurantes')
@@ -156,19 +194,15 @@ def cadastrar_novo_restaurante():
     if categoria is None:
         return
         
-    if verifica_restaurante_cadastrado(nome_do_restaurante, categoria, restaurantes_cadastrados):
+    if verifica_restaurante_cadastrado(nome_do_restaurante, categoria, Restaurante.restaurantes_cadastrados):
         print(f'Restaurante {nome_do_restaurante} já cadastrado.\n')
         input('\nPressione Enter para continuar.')
         return
     
 
-    dados_do_restaurante = {
-        'nome': nome_do_restaurante,
-        'categoria': categoria,
-        'ativo': False
-    }
+    novo_restaurante = Restaurante(nome_do_restaurante, categoria)
 
-    restaurantes_cadastrados.append(dados_do_restaurante)
+    Restaurante.restaurantes_cadastrados.append(novo_restaurante)
 
     print(f'Restaurante {nome_do_restaurante} cadastrado com sucesso.\n')
     input('\nPressione Enter para continuar.')
@@ -178,22 +212,20 @@ def listar_restaurantes():
     """
     Lista todos os restaurantes cadastrados.
 
-    Exibe nome, categoria e status de cada
-    restaurante armazenado no sistema.
+    Exibe em formato de tabela o nome, a categoria
+    e o status dos objetos Restaurante armazenados
+    em Restaurante.restaurantes_cadastrados.
     """
     exibir_subtitulo('Listando os Restaurantes')
 
     print(f'{"Nome do restaurante".ljust(22)} | {"Categoria".ljust(20)} | Status')
 
-    for restaurante in restaurantes_cadastrados:
-        nome_restaurante = restaurante['nome']
-        categoria_restaurante = restaurante['categoria']
-        ativo = 'Restaurante aberto' if restaurante['ativo'] else 'Restaurante fechado'
+    for restaurante in Restaurante.restaurantes_cadastrados:
 
         print(
-            f'- {nome_restaurante.ljust(20)} | '
-            f'{categoria_restaurante.ljust(20)} | '
-            f'{ativo}'
+            f'- {restaurante.nome.ljust(20)} | '
+            f'{restaurante.categoria.ljust(20)} | '
+            f'{restaurante.status}'
         )
 
     input('\nPressione Enter para continuar.')
@@ -229,19 +261,15 @@ def alternar_estado_restaurante():
         cancelar_operacao()
         return
 
-    for restaurante in restaurantes_cadastrados:
+    for restaurante in Restaurante.restaurantes_cadastrados:
 
-        if nome_restaurante.lower() == restaurante['nome'].strip().lower():
+        if nome_restaurante.lower() == restaurante.nome.strip().lower():
             restaurante_encontrado = True
-            restaurante['ativo'] = not restaurante['ativo']
+            restaurante.alternar_estado()
 
-            if restaurante['ativo']:
-                print(f'Restaurante {nome_restaurante} ativado com sucesso.\n')
-            else:
-                print(f'Restaurante {nome_restaurante} desativado com sucesso.\n')
-
+            print(f'Restaurante {nome_restaurante} {restaurante.status}.\n')
             break
-
+        
     if not restaurante_encontrado:
         print('Restaurante não encontrado.\n')
 
