@@ -1,6 +1,7 @@
 from __future__ import annotations
 from utils import exibir_subtitulo
 from menus import cancelar_operacao
+from database import salvar_restaurante, carregar_restaurantes
 
 class Restaurante:
     restaurantes_cadastrados: list['Restaurante'] = []
@@ -164,13 +165,13 @@ def cadastrar_novo_restaurante():
     - inexistência de cadastro duplicado.
 
     Caso todas as validações sejam aprovadas, uma nova instância de
-    Restaurante é criada e adicionada à lista de restaurantes
-    cadastrados.
+    Restaurante é criada, adicionada à lista de restaurantes cadastrados
+    e persistida no banco de dados SQLite.
 
     O usuário pode cancelar a operação antes da conclusão do cadastro.
 
     Returns:
-        None
+    None
     """
 
     exibir_subtitulo('Cadastro de novos restaurantes')
@@ -203,6 +204,7 @@ def cadastrar_novo_restaurante():
     novo_restaurante = Restaurante(nome_do_restaurante, categoria)
 
     Restaurante.restaurantes_cadastrados.append(novo_restaurante)
+    salvar_restaurante(novo_restaurante)
 
     print(f'Restaurante {nome_do_restaurante} cadastrado com sucesso.\n')
     input('\nPressione Enter para continuar.')
