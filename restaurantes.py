@@ -1,15 +1,15 @@
 from __future__ import annotations
 from utils import exibir_subtitulo
 from menus import cancelar_operacao
-from database import salvar_restaurante, carregar_restaurantes
+from database import salvar_restaurante, carregar_restaurantes, excluir_restaurante_banco
 
 class Restaurante:
     restaurantes_cadastrados: list['Restaurante'] = []
     
-    def __init__(self, nome, categoria):
+    def __init__(self, nome, categoria, ativo=False):
         self._nome = nome
         self._categoria = categoria
-        self._ativo = False
+        self._ativo = bool(ativo)
     
     @property
     def nome(self):
@@ -48,12 +48,6 @@ class Restaurante:
         
         self._ativo = not self._ativo
 
-Restaurante.restaurantes_cadastrados = [
-    Restaurante('Praça', 'Japonesa'),
-    Restaurante('Pizza Suprema', 'Pizza'),
-    Restaurante('Cantina', 'Italiana')
-]
-
     
 CATEGORIAS = [
     'Pizza',
@@ -81,6 +75,14 @@ CATEGORIAS = [
     'Marmita'
 ]
 
+def carregar_restaurantes_do_banco():
+    lista_restaurantes = carregar_restaurantes()
+    
+    for restaurante in lista_restaurantes:
+        novo_restaurante = Restaurante(restaurante[1], restaurante[2], restaurante[3])
+        Restaurante.restaurantes_cadastrados.append(novo_restaurante)
+    
+    
 
 def verifica_restaurante_cadastrado(nome, categoria, restaurantes_cadastrados):
 
@@ -275,8 +277,6 @@ def listar_restaurantes_por_categoria():
     input('\nPressione Enter para continuar.')
     
     
-
-
 def alternar_estado_restaurante():
 
     """
@@ -320,3 +320,55 @@ def alternar_estado_restaurante():
         print('Restaurante não encontrado.\n')
 
     input('\nPressione Enter para continuar.')
+    
+def deletar_restaurante():
+    
+    exibir_subtitulo('Excluir restaurante cadastrado')
+    nome_restaurante = input('Digite o nome do restaurante que deseja excluir ou ("voltar" para cancelar a operação)').strip()
+    
+    if nome_restaurante.lower() == 'voltar':
+        cancelar_operacao()
+        return
+    
+    lista_excluir_restaurante = []
+    
+    for restaurante in Restaurante.restaurantes_cadastrados:
+        
+        if nome_restaurante.lower() == restaurante.nome.strip().lower():
+            lista_excluir_restaurante.append(restaurante)
+            
+    if not lista_excluir_restaurante:
+        print('Nenhum restaurante encontrado com esse nome.\n')
+        input('\nPressione Enter para continuar.')
+    else:
+        print(f'{"Nome do restaurante".ljust(22)} | Categoria')
+        for indice, restaurante in enumerate(lista_excluir_restaurante, start=1):
+            print(f'{indice} - {restaurante.nome.ljust(20)} | {restaurante.categoria}')
+            
+        while True:
+
+            restaurante_excluir = input('Digite o numero do restaurante que deseja excluir ou ("voltar" para cancelar a operação)').strip()
+            
+            if restaurante_excluir.lower() == 'voltar':
+                cancelar_operacao()
+                return
+            
+            try:
+                escolha_excluir = int(restaurante_excluir)
+                if 1 <= escolha_excluir <= len(lista_excluir_restaurante):
+                    restaurante_escolhido = lista_excluir_restaurante[escolha_excluir - 1]
+                    
+                    confirmacao = input(f'Confirmar a exclusão de {restaurante_escolhido.nome}? (s/n): ').strip().lower()
+                    
+                    if confirmacao == 's':
+                        Restaurante.restaurantes_cadastrados.remove(restaurante_escolhido)
+                        excluir_restaurante_banco(restaurante_escolhido)
+                        print('Restaurante excluido com sucesso. \n')
+                        break
+                    else:
+                        print('Exclusão cancelada. \n')        
+                else:
+                    print('\nOpção inválida. \n')
+            except ValueError:
+                print('\nDigite apenas números. \n')
+        input('\nPressione Enter para continuar.')

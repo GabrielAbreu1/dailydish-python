@@ -1,6 +1,6 @@
 from utils import limpar_tela, exibir_nome_do_programa, exibir_opcoes
 from menus import finalizar_app, opcao_invalida
-from restaurantes import alternar_estado_restaurante, listar_restaurantes, cadastrar_novo_restaurante, listar_restaurantes_por_categoria
+from restaurantes import alternar_estado_restaurante, listar_restaurantes, cadastrar_novo_restaurante, listar_restaurantes_por_categoria, carregar_restaurantes_do_banco, deletar_restaurante
 from database import inicializar_banco
 
 def escolher_opcao():
@@ -27,6 +27,9 @@ def escolher_opcao():
                 alternar_estado_restaurante()
                 return True
             case 5:
+                deletar_restaurante()
+                return True
+            case 6:
                 finalizar_app()
                 return False
             case _:
@@ -48,6 +51,8 @@ def main():
     """
 
     inicializar_banco()
+    carregar_restaurantes_do_banco()
+    
     while True:
         limpar_tela()
         exibir_nome_do_programa()

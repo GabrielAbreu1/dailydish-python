@@ -37,7 +37,8 @@ def exibir_opcoes():
     print('2. Listar Restaurantes')
     print('3. Filtrar por Categoria')
     print('4. Alterar Status Restaurante')
-    print('5. Sair\n')
+    print('5. Excluir Restaurante')
+    print('6. Sair\n')
 
 
 def exibir_subtitulo(texto):

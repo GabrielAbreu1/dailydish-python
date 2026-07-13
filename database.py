@@ -87,3 +87,17 @@ def carregar_restaurantes():
 	conexao.close()
 
 	return tabela
+
+
+def excluir_restaurante_banco(restaurante):
+    
+    conexao = sqlite3.connect('dailydish.db')
+    
+    cursor = conexao.cursor()
+    
+    cursor.execute("""
+    DELETE FROM restaurantes WHERE nome = ? AND categoria = ?
+    """, (restaurante.nome, restaurante.categoria))
+    
+    conexao.commit()
+    conexao.close()
