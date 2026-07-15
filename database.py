@@ -90,6 +90,20 @@ def carregar_restaurantes():
 
 
 def excluir_restaurante_banco(restaurante):
+    """
+    Remove um restaurante do banco de dados.
+
+    Exclui da tabela `restaurantes` o registro correspondente ao
+    restaurante informado, utilizando o nome e a categoria como
+    critérios de identificação.
+
+    Args:
+        restaurante (Restaurante): Instância da classe Restaurante
+            que será removida do banco de dados.
+
+    Returns:
+        None
+    """
     
     conexao = sqlite3.connect('dailydish.db')
     
@@ -98,6 +112,34 @@ def excluir_restaurante_banco(restaurante):
     cursor.execute("""
     DELETE FROM restaurantes WHERE nome = ? AND categoria = ?
     """, (restaurante.nome, restaurante.categoria))
+    
+    conexao.commit()
+    conexao.close()
+    
+    
+def atualizar_estado_banco(restaurante):
+    """
+    Atualiza o estado de ativação de um restaurante no banco de dados.
+
+    Localiza o restaurante na tabela `restaurantes` utilizando o nome
+    e a categoria como critérios de identificação e atualiza o valor
+    do campo `ativo` de acordo com o estado atual do objeto.
+
+    Args:
+        restaurante (Restaurante): Instância da classe Restaurante
+            contendo o novo estado de ativação.
+
+    Returns:
+        None
+    """
+    
+    conexao = sqlite3.connect('dailydish.db')
+    
+    cursor = conexao.cursor()
+    
+    cursor.execute("""
+    UPDATE restaurantes SET ativo = ? WHERE nome = ? AND categoria = ?       
+    """, (restaurante.ativo, restaurante.nome, restaurante.categoria))
     
     conexao.commit()
     conexao.close()

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from utils import exibir_subtitulo
 from menus import cancelar_operacao
-from database import salvar_restaurante, carregar_restaurantes, excluir_restaurante_banco
+from database import salvar_restaurante, carregar_restaurantes, excluir_restaurante_banco, atualizar_estado_banco
 
 class Restaurante:
     restaurantes_cadastrados: list['Restaurante'] = []
@@ -278,31 +278,29 @@ def listar_restaurantes_por_categoria():
     
     
 def alternar_estado_restaurante():
-
     """
-    Alterna o estado (ativo/inativo) de um restaurante cadastrado.
+    Alterna o estado de ativação de um restaurante cadastrado.
 
-    O usuário informa o nome do restaurante, e o sistema realiza a busca
-    na lista de restaurantes cadastrados.
+    Solicita o nome do restaurante e exibe todos os restaurantes
+    encontrados com esse nome para que o usuário escolha qual registro
+    deseja alterar.
 
-    A comparação do nome é feita de forma case-insensitive (ignorando
-    maiúsculas e minúsculas) e também desconsidera espaços extras,
-    utilizando .strip() e .lower().
+    Após a seleção, solicita uma confirmação. Caso a operação seja
+    confirmada, o estado do restaurante é alternado entre ativo e
+    inativo, sendo a alteração refletida tanto na lista de restaurantes
+    cadastrados quanto no banco de dados SQLite.
 
-    Se o restaurante for encontrado, o campo 'ativo' é invertido:
-    - True → False (desativa)
-    - False → True (ativa)
+    O usuário pode cancelar a operação a qualquer momento.
 
-    Caso o restaurante não seja encontrado, uma mensagem de erro é exibida.
-
-    Não retorna valores.
+    Returns:
+        None
     """
     
     exibir_subtitulo('Alternando estado do restaurante')
-    nome_restaurante = input('Digite o nome do restaurante que deseja alternar o estado ou ("voltar" para cancelar a operação): ').strip()
+    nome_restaurante = input('Digite o nome do restaurante que deseja alterar o estado ou ("voltar" para cancelar a operação): ').strip()
 
-    restaurante_encontrado = False
-
+    lista_restaurantes_encontrados = []
+    
     if nome_restaurante.lower() == 'voltar':
         cancelar_operacao()
         return
@@ -310,18 +308,62 @@ def alternar_estado_restaurante():
     for restaurante in Restaurante.restaurantes_cadastrados:
 
         if nome_restaurante.lower() == restaurante.nome.strip().lower():
-            restaurante_encontrado = True
-            restaurante.alternar_estado()
+            lista_restaurantes_encontrados.append(restaurante)
 
-            print(f'Restaurante {nome_restaurante} {restaurante.status}.\n')
-            break
         
-    if not restaurante_encontrado:
+    if not lista_restaurantes_encontrados:
         print('Restaurante não encontrado.\n')
+    else: 
+        print(f'{"Nome do restaurante".ljust(22)} | {"Categoria".ljust(22)} | Status')
+        for indice, restaurante in enumerate(lista_restaurantes_encontrados, start=1):
+            print(f'{indice} - {restaurante.nome.ljust(20)} | {restaurante.categoria.ljust(20)} | {restaurante.status}')
+
+        while True:
+
+            restaurante_alternar = input('Digite o numero do restaurante que deseja alterar o estado ou ("voltar" para cancelar a operação)' ).strip()
+            
+            if restaurante_alternar.lower() == 'voltar':
+                cancelar_operacao()
+                return
+            
+            try:
+                escolha_alternar = int(restaurante_alternar)
+                if 1 <= escolha_alternar <= len(lista_restaurantes_encontrados):
+                    restaurante_escolhido = lista_restaurantes_encontrados[escolha_alternar - 1]
+                    
+                    confirmacao = input(f'Confirmar a alteração de estado do {restaurante_escolhido.nome}? (s/n): ').strip().lower()
+                    
+                    if confirmacao == 's':
+                        restaurante_escolhido.alternar_estado()
+                        atualizar_estado_banco(restaurante_escolhido)
+                        print(f'Restaurante {restaurante_escolhido.nome} {restaurante_escolhido.status}. \n')
+                        break
+                    else:
+                        print('Alternação cancelada. \n')        
+                else:
+                    print('\nOpção inválida. \n')
+            except ValueError:
+                print('\nDigite apenas números. \n')
 
     input('\nPressione Enter para continuar.')
     
 def deletar_restaurante():
+    """
+    Remove um restaurante cadastrado do sistema.
+
+    Solicita o nome do restaurante a ser excluído e exibe todos os
+    restaurantes encontrados com esse nome para que o usuário escolha
+    qual registro deseja remover.
+
+    Antes da exclusão, solicita uma confirmação do usuário. Caso a
+    operação seja confirmada, o restaurante é removido da lista de
+    restaurantes cadastrados e do banco de dados SQLite.
+
+    O usuário pode cancelar a operação a qualquer momento.
+
+    Returns:
+        None
+    """
     
     exibir_subtitulo('Excluir restaurante cadastrado')
     nome_restaurante = input('Digite o nome do restaurante que deseja excluir ou ("voltar" para cancelar a operação)').strip()
